@@ -54,6 +54,7 @@ import java.util.function.Supplier;
  * Lambda expressions is met better than the second version.
  */
 public class Functions {
+
     @FunctionalInterface
     public interface FailableRunnable<T extends Throwable> {
         /**
@@ -62,6 +63,7 @@ public class Functions {
          */
         void run() throws T;
     }
+
     @FunctionalInterface
     public interface FailableCallable<O, T extends Throwable> {
         /**
@@ -71,6 +73,7 @@ public class Functions {
          */
         O call() throws T;
     }
+
     @FunctionalInterface
     public interface FailableConsumer<O, T extends Throwable> {
         /**
@@ -80,6 +83,7 @@ public class Functions {
          */
         void accept(O pObject) throws T;
     }
+
     @FunctionalInterface
     public interface FailableBiConsumer<O1, O2, T extends Throwable> {
         /**
@@ -90,6 +94,7 @@ public class Functions {
          */
         void accept(O1 pObject1, O2 pObject2) throws T;
     }
+
     @FunctionalInterface
     public interface FailableFunction<I, O, T extends Throwable> {
         /**
@@ -100,6 +105,7 @@ public class Functions {
          */
         O apply(I pInput) throws T;
     }
+
     @FunctionalInterface
     public interface FailableBiFunction<I1, I2, O, T extends Throwable> {
         /**
@@ -111,6 +117,7 @@ public class Functions {
          */
         O apply(I1 pInput1, I2 pInput2) throws T;
     }
+
     @FunctionalInterface
     public interface FailablePredicate<O, T extends Throwable> {
         /**
@@ -121,6 +128,7 @@ public class Functions {
          */
         boolean test(O pObject) throws T;
     }
+
     @FunctionalInterface
     public interface FailableBiPredicate<O1, O2, T extends Throwable> {
         /**
@@ -132,6 +140,7 @@ public class Functions {
          */
         boolean test(O1 pObject1, O2 pObject2) throws T;
     }
+
     @FunctionalInterface
     public interface FailableSupplier<O, T extends Throwable> {
         /**
@@ -149,13 +158,7 @@ public class Functions {
      * @return a standard {@code Runnable}
      */
     public static Runnable asRunnable(FailableRunnable<?> pRunnable) {
-        return () -> {
-            try {
-                pRunnable.run();
-            } catch (Throwable t) {
-                throw rethrow(t);
-            }
-        };
+        return () -> run(pRunnable);
     }
 
     /**
@@ -166,13 +169,7 @@ public class Functions {
      * @return a standard {@code Consumer}
      */
     public static <I> Consumer<I> asConsumer(FailableConsumer<I, ?> pConsumer) {
-        return (pInput) -> {
-            try {
-                pConsumer.accept(pInput);
-            } catch (Throwable t) {
-                throw rethrow(t);
-            }
-        };
+        return (pInput) -> accept(pConsumer, pInput);
     }
 
     /**
@@ -183,13 +180,7 @@ public class Functions {
      * @return a standard {@code Callable}
      */
     public static <O> Callable<O> asCallable(FailableCallable<O, ?> pCallable) {
-        return () -> {
-            try {
-                return pCallable.call();
-            } catch (Throwable t) {
-                throw rethrow(t);
-            }
-        };
+        return () -> call(pCallable);
     }
 
     /**
@@ -201,13 +192,7 @@ public class Functions {
      * @return a standard {@code BiConsumer}
      */
     public static <I1, I2> BiConsumer<I1, I2> asBiConsumer(FailableBiConsumer<I1, I2, ?> pConsumer) {
-        return (pInput1, pInput2) -> {
-            try {
-                pConsumer.accept(pInput1, pInput2);
-            } catch (Throwable t) {
-                throw rethrow(t);
-            }
-        };
+        return (pInput1, pInput2) -> accept(pConsumer, pInput1, pInput2);
     }
 
     /**
@@ -219,13 +204,7 @@ public class Functions {
      * @return a standard {@code Function}
      */
     public static <I, O> Function<I, O> asFunction(FailableFunction<I, O, ?> pFunction) {
-        return (pInput) -> {
-            try {
-                return pFunction.apply(pInput);
-            } catch (Throwable t) {
-                throw rethrow(t);
-            }
-        };
+        return (pInput) -> apply(pFunction, pInput);
     }
 
     /**
@@ -238,13 +217,7 @@ public class Functions {
      * @return a standard {@code BiFunction}
      */
     public static <I1, I2, O> BiFunction<I1, I2, O> asBiFunction(FailableBiFunction<I1, I2, O, ?> pFunction) {
-        return (pInput1, pInput2) -> {
-            try {
-                return pFunction.apply(pInput1, pInput2);
-            } catch (Throwable t) {
-                throw rethrow(t);
-            }
-        };
+        return (pInput1, pInput2) -> apply(pFunction, pInput1, pInput2);
     }
 
     /**
@@ -255,13 +228,7 @@ public class Functions {
      * @return a standard {@code Predicate}
      */
     public static <I> Predicate<I> asPredicate(FailablePredicate<I, ?> pPredicate) {
-        return (pInput) -> {
-            try {
-                return pPredicate.test(pInput);
-            } catch (Throwable t) {
-                throw rethrow(t);
-            }
-        };
+        return (pInput) -> test(pPredicate, pInput);
     }
 
     /**
@@ -273,13 +240,7 @@ public class Functions {
      * @return a standard {@code BiPredicate}
      */
     public static <I1, I2> BiPredicate<I1, I2> asBiPredicate(FailableBiPredicate<I1, I2, ?> pPredicate) {
-        return (pInput1, pInput2) -> {
-            try {
-                return pPredicate.test(pInput1, pInput2);
-            } catch (Throwable t) {
-                throw rethrow(t);
-            }
-        };
+        return (pInput1, pInput2) -> test(pPredicate, pInput1, pInput2);
     }
 
     /**
@@ -290,13 +251,7 @@ public class Functions {
      * @return a standard {@code Supplier}
      */
     public static <O> Supplier<O> asSupplier(FailableSupplier<O, ?> pSupplier) {
-        return () -> {
-            try {
-                return pSupplier.get();
-            } catch (Throwable t) {
-                throw rethrow(t);
-            }
-        };
+        return () -> get(pSupplier);
     }
 
     /**
@@ -536,23 +491,21 @@ public class Functions {
     }
 
     /**
-     * Rethrow a {@link Throwable} as an unchecked exception.
+     * Rethrows a {@link Throwable} as an unchecked exception.
      * @param pThrowable The throwable to rethrow
      * @return Never returns anything, this method never terminates normally
      */
     public static RuntimeException rethrow(Throwable pThrowable) {
         if (pThrowable == null) {
             throw new NullPointerException("The Throwable must not be null.");
+        } else if (pThrowable instanceof RuntimeException) {
+            throw (RuntimeException) pThrowable;
+        } else if (pThrowable instanceof Error) {
+            throw (Error) pThrowable;
+        } else if (pThrowable instanceof IOException) {
+            throw new UncheckedIOException((IOException) pThrowable);
         } else {
-            if (pThrowable instanceof RuntimeException) {
-                throw (RuntimeException) pThrowable;
-            } else if (pThrowable instanceof Error) {
-                throw (Error) pThrowable;
-            } else if (pThrowable instanceof IOException) {
-                throw new UncheckedIOException((IOException) pThrowable);
-            } else {
-                throw new UndeclaredThrowableException(pThrowable);
-            }
+            throw new UndeclaredThrowableException(pThrowable);
         }
     }
 }
